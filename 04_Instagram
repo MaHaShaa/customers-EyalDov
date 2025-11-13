@@ -1,0 +1,449 @@
+# Instagram Setup Guide
+
+---
+
+## What You're Setting Up
+
+Since Facebook owns Instagram, we can reuse most of the Facebook setup. You'll be:
+1. Converting your Instagram to a Business account
+2. Linking it to your Facebook Page
+3. Adding Instagram Graph API to your Facebook app
+4. **CRITICAL:** Adding yourself as an App Tester
+5. **CRITICAL:** Accepting the tester invitation
+6. Getting your Instagram Business Account ID
+
+The token is shared with Facebook, so no separate token generation needed!
+
+---
+
+## Prerequisites
+
+- ✅ Instagram account (Personal, Business, or Creator)
+- ✅ **Facebook setup completed** (you need the same app and token)
+- ✅ Facebook Business Page (already linked from Facebook setup)
+- ✅ 15 minutes of focused time
+
+---
+
+## Important: Instagram Is Stricter Than Facebook
+
+Instagram Reels have specific requirements:
+
+⚠️ **MUST BE VERTICAL (9:16):**
+- Resolution: 1080 x 1920 ONLY
+- Horizontal videos (16:9) will be REJECTED
+- Square videos (1:1) will be REJECTED
+
+⚠️ **Other requirements:**
+- Duration: 3-90 seconds (60 seconds recommended)
+- File size: Max 1 GB (but 100 MB recommended)
+- Format: MP4 with H.264 codec
+
+If your video doesn't meet these specs, Instagram will reject it with an error.
+
+---
+
+## Step-by-Step Setup
+
+### Part 1: Convert to Business Account
+
+If your Instagram is already a Business or Creator account, skip to Part 2.
+
+#### Convert Your Account
+
+1. **Open Instagram app on your phone** (this step requires mobile)
+2. Go to your profile
+3. Tap the **menu icon** (☰ three lines, top right)
+4. Tap **"Settings and privacy"**
+5. Scroll down to **"Account type and tools"**
+6. Tap **"Switch to professional account"**
+7. Choose account type:
+   - **Business:** If you're a company/brand
+   - **Creator:** If you're a personal brand/influencer
+   - (Either works for our purposes)
+8. **Select a category** that fits your content
+9. Follow the prompts to complete setup
+10. **Make sure profile is PUBLIC** (not private) - API won't work with private accounts
+
+---
+
+### Part 2: Link Instagram to Facebook Page
+
+#### Connect the Accounts
+
+1. Still in Instagram app → **Settings and privacy**
+2. Scroll to **"Business"** section
+3. Tap **"Account Center"** (or "Linked accounts")
+4. Tap **"Facebook"**
+5. Select your Facebook Page (the one from Facebook setup)
+6. Tap **"Continue"** to link them
+
+**Verify the link:**
+- Go back to your Instagram profile
+- Tap "Edit profile"
+- Scroll down - you should see **"Page"** with your Facebook Page name
+- If you see it, they're linked! ✅
+
+---
+
+### Part 3: Add Instagram Graph API to Facebook App
+
+#### Enable Instagram Product
+
+1. Go to: **https://developers.facebook.com/apps**
+2. Click on your app (Social Media Video Automation)
+3. In the left sidebar, find **"Add products"** section
+4. Find **"Instagram Graph API"** card
+5. Click **"Set up"** button
+6. You'll be taken to the Instagram API settings
+7. No configuration needed - it's automatically enabled
+
+---
+
+### Part 4: Request Instagram Permissions
+
+#### Add Required Permissions
+
+1. In the left sidebar, click **"App Review"** → **"Permissions and features"**
+2. Scroll down to Instagram permissions
+3. Find these and click **"Request Advanced Access"**:
+
+   - **`instagram_basic`**
+     - Select: "Your app lets people interact with their Instagram account"
+     - Click **"Get Advanced Access"**
+
+   - **`instagram_content_publish`**
+     - Select: "Your app lets people post content to their Instagram account"
+     - Click **"Get Advanced Access"**
+
+4. For both permissions:
+   - Review the requirements
+   - Click **"Get Advanced Access"** to confirm
+   - Status should change to "Granted"
+
+**Note:** The same `pages_` permissions from Facebook also apply to Instagram.
+
+---
+
+### Part 5: Add Instagram Account as App Tester (CRITICAL!)
+
+This is THE MOST IMPORTANT step. Miss this and uploads will fail with "Insufficient Developer Role" error.
+
+#### Add Yourself as Tester
+
+1. In the left sidebar, click **"Roles"** → **"Roles"**
+2. Scroll to **"Instagram Testers"** section
+3. Click **"Add Instagram Testers"**
+4. **Type your Instagram username** in the search box
+5. Click your profile when it appears
+6. Click **"Submit"** or **"Add"**
+
+**You'll see:**
+- Your Instagram account listed
+- Status: **"Invited"** (not yet accepted)
+
+---
+
+### Part 6: Accept Tester Invitation (CRITICAL!)
+
+Now you need to accept the invitation in Instagram.
+
+#### Accept the Invitation
+
+1. **Open Instagram app on your phone**
+2. Tap the **menu icon** (☰ three lines, top right)
+3. Tap **"Settings and privacy"**
+4. Tap **"Apps and websites"** (or "Website permissions")
+5. Tap **"Tester invites"** (might be under "Developer invites")
+6. You should see an invitation from your app
+7. Tap **"Accept"**
+
+**Verify the acceptance:**
+- Go back to Facebook Developers → Roles → Instagram Testers
+- Refresh the page
+- Status should now say **"Accepted"** ✅
+
+⚠️ **IF YOU DON'T SEE THE INVITATION:**
+- Wait 5-10 minutes and check again
+- Make sure you're logged into the correct Instagram account
+- Try force-closing and reopening Instagram app
+- Check under different menu options (locations vary by Instagram version)
+
+**This step is crucial!** Without it, uploads will fail with:
+```
+Error: (#200) Insufficient permission to publish content
+```
+
+---
+
+### Part 7: Get Instagram Business Account ID
+
+⚠️ **We'll do this together during our setup meeting.**
+
+Your Instagram Business Account ID can be found in your Facebook App settings or via a Graph API call.
+
+**What you need to bring to the meeting:**
+- Confirmation that Instagram is linked to your Facebook Page (Part 2 completed)
+- Confirmation that you've accepted the tester invitation (Part 6 completed)
+
+**What we'll do together:**
+1. Find your Instagram Business Account ID (either in Facebook App or via API call)
+2. Configure this ID in your n8n workflows along with Facebook credentials
+
+**Why we do this together:**
+Instagram uses the same Facebook token, so we'll configure both Facebook and Instagram credentials in n8n at the same time during our setup meeting.
+
+---
+
+## After Setup Meeting
+
+Once we've configured Instagram together, the integration will be ready.
+
+### Understanding the Instagram Upload Process
+
+Instagram uses a 3-step process (different from Facebook's direct upload):
+
+```
+Step 1: Create Container
+  POST /instagram_business_account_id/media
+  {
+    "media_type": "REELS",
+    "video_url": "[public Dropbox URL]",
+    "caption": "[your caption]",
+    "access_token": "[token]"
+  }
+  Response: { "id": "[container_id]" }
+
+Step 2: Wait for Processing
+  Instagram downloads video from URL
+  Processes it (20-40 seconds)
+
+Step 3: Publish Reel
+  POST /instagram_business_account_id/media_publish
+  {
+    "creation_id": "[container_id]",
+    "access_token": "[token]"
+  }
+  Response: { "id": "[media_id]" }
+```
+
+**Why this matters:**
+- Upload takes 40-60 seconds total (longer than other platforms)
+- Video must be accessible via public URL (we use Dropbox temporary links)
+- If you publish before Instagram finishes processing → ERROR
+
+Our automation handles all this automatically!
+
+---
+
+**What gets posted:**
+- **Type:** Reel
+- **Caption:** From filename
+- **Visibility:** Public
+- **Location:** Visible on your profile grid
+
+---
+
+## How Instagram Upload Works
+
+Here's the Instagram upload flow:
+
+```
+Video processed
+  ↓
+System validates specs (MUST be 9:16!)
+  ↓
+Creates container with public URL
+  ↓
+Instagram downloads & processes video (20-40s)
+  ↓
+System waits (40 seconds)
+  ↓
+System publishes Reel
+  ↓
+Reel appears on your profile
+  ↓
+Airtable updated with Reel ID
+```
+
+---
+
+## Token Information
+
+Instagram uses the same token as Facebook.
+
+- **Token Type:** Facebook Page Access Token
+- **Expiration:** Never (technically)
+- **Renewal:** Same as Facebook - every 50 days
+- **Manual Action Needed:** ⚠️ Yes (same 2-minute process as Facebook)
+
+When you renew the Facebook token (every 50 days), Instagram automatically gets the new token too. One renewal = both platforms!
+
+---
+
+## Instagram Reel Limits
+
+- **Daily limit:** ~25 reels per day
+- **Rate limit:** 1 reel per hour recommended
+- **Processing time:** 20-40 seconds per reel
+
+**Our automation:**
+- Respects these limits
+- Spreads uploads throughout the day
+- Currently uploading 6 videos/day (well under limit)
+
+---
+
+## Troubleshooting
+
+### "Insufficient permission" or "Insufficient developer role"
+**This is the #1 error!**
+
+**Solution:**
+1. Go to Facebook Developers → Roles → Instagram Testers
+2. Verify your account shows "Accepted" status
+3. If not, repeat Part 6 (accept invitation in Instagram app)
+4. Check under all menu locations in Instagram:
+   - Settings → Apps and websites → Tester invites
+   - Settings → Security → Apps and websites
+   - Settings → Account → Linked accounts
+
+**Still not working?**
+- Log out and back into Instagram
+- Uninstall and reinstall Instagram app
+- Wait 30 minutes and try again (Facebook's servers sync slowly)
+
+### "Video URL is not a valid video file"
+**Possible causes:**
+1. Dropbox URL expired (links last 4 hours)
+2. Video not accessible (permissions issue)
+3. Video format not supported
+
+**Solution:**
+- Our system generates fresh URLs automatically
+- Make sure video is MP4 with H.264 codec
+- Check video uploaded successfully to Dropbox
+
+### "Video uploaded but not appearing as Reel"
+**Possible causes:**
+1. Video is horizontal (16:9) - Instagram rejected it
+2. Instagram still processing (can take 5-10 minutes)
+3. Account is private (must be public)
+
+**Solution:**
+- Verify video is 1080x1920 vertical
+- Wait 10 minutes
+- Check profile is set to Public (not Private)
+- Look in Instagram Insights for error messages
+
+### "Can't find Instagram Business Account ID"
+**Solution:**
+- Make sure Instagram is converted to Business/Creator account
+- Verify Instagram is linked to Facebook Page
+- Use the correct Page Access Token in Graph API Explorer
+- Try this endpoint: `/me/accounts?fields=instagram_business_account`
+
+### "Container creation fails"
+**Possible causes:**
+1. Token expired or invalid
+2. Video doesn't meet specs (wrong aspect ratio, too long, etc.)
+3. Account not authorized as tester
+
+**Solution:**
+- Check token is current (renew if needed)
+- Validate video: 1080x1920, <60 seconds, MP4
+- Verify tester role accepted
+
+---
+
+## Common Questions
+
+**Q: Can I post to multiple Instagram accounts?**
+A: Yes, but each needs its own Business Account ID and tester invitation. Tell me and we can set up multi-account support.
+
+**Q: Can I customize captions?**
+A: Yes! I can configure the workflow to use custom captions instead of filename.
+
+**Q: What if I want to add hashtags?**
+A: Tell me your preferred hashtags and I'll add them to the caption template.
+
+**Q: Can I schedule Reels for later?**
+A: Instagram API doesn't support scheduled posts, but we can delay the automation to post at specific times.
+
+**Q: Will this show up in my Instagram Insights?**
+A: Yes! API-posted Reels show in Insights just like manually posted ones.
+
+**Q: Why does Instagram take longer than other platforms?**
+A: Instagram's 3-step process (create → process → publish) is slower than direct uploads. That's just how their API works.
+
+---
+
+## Instagram vs Facebook: Key Differences
+
+| Feature | Facebook | Instagram |
+|---------|----------|-----------|
+| **Upload method** | Direct upload | 3-step (container → wait → publish) |
+| **Aspect ratio** | Flexible (9:16 or 16:9) | STRICT 9:16 only |
+| **Processing time** | Instant | 20-40 seconds |
+| **Daily limit** | ~50 videos | ~25 reels |
+| **Token** | Page Access Token | Same token |
+
+---
+
+## Next Steps
+
+✅ **Instagram is connected!** Reels will now post automatically.
+
+✅ **Both Facebook and Instagram use the same token**, so renewal is easy!
+
+**What's next:**
+1. Open `05_TikTok_Setup.md`
+2. Learn about TikTok status (pending approval)
+3. See what happens when they approve our app
+
+---
+
+## Quick Reference
+
+**Instagram Business Account ID:** [saved securely]
+
+**Token:** Same as Facebook Page Access Token
+
+**Token Renewal:** Same as Facebook (every 50 days)
+
+**Required Permissions:**
+- `instagram_basic`
+- `instagram_content_publish`
+- `pages_show_list` (from Facebook)
+- `pages_manage_posts` (from Facebook)
+- `pages_read_engagement` (from Facebook)
+
+**Tester Role:**
+- **Status:** Must be "Accepted" ✅
+- **Location:** Facebook Developers → Roles → Instagram Testers
+- **Verified in:** Instagram app → Settings → Apps and websites → Tester invites
+
+**Video Requirements (STRICT!):**
+- Resolution: 1080 x 1920 (vertical)
+- Aspect ratio: 9:16 ONLY
+- Duration: 3-90 seconds (60s recommended)
+- Format: MP4, H.264 codec
+- File size: <1 GB (<100 MB recommended)
+
+**Upload Process:**
+1. Create container (5s)
+2. Instagram processes (20-40s)
+3. Publish reel (5s)
+4. **Total:** ~60 seconds per reel
+
+---
+
+**Next:** Open `05_TikTok_Setup.md`
+
+---
+
+**Document Version:** 1.0
+**Created:** November 13, 2025
+**Platform:** Instagram
+**Status:** Ready for use
+**Token Renewal:** Same as Facebook (every 50 days)
