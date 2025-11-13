@@ -1,0 +1,345 @@
+# Dropbox Setup Guide
+
+---
+
+## What You're Setting Up
+
+Dropbox is where you'll upload your videos. We're going to:
+1. Create a Dropbox "app" (it's like a connector)
+2. Give it permission to watch your folder
+3. Connect it to our automation
+4. Create the upload folder
+
+Think of this as installing a doorbell that rings whenever you drop a video in a specific folder.
+
+---
+
+## Prerequisites
+
+- ✅ Dropbox account (any plan - free works fine)
+- ✅ Admin access to your Dropbox
+- ✅ 15 minutes of focused time
+
+---
+
+## Step-by-Step Setup
+
+### Step 1: Go to Dropbox Developer Console
+
+1. Open your browser and go to: **https://www.dropbox.com/developers/apps**
+2. Log in with your Dropbox account
+3. You'll see a page that says "My apps" at the top
+
+---
+
+### Step 2: Create a New App
+
+1. Click the **"Create app"** button (usually blue, top right)
+
+2. You'll see a form with several options. Fill it out like this:
+
+   **Choose an API:**
+   - Select **"Scoped access"** (the recommended option)
+
+   **Choose the type of access you need:**
+   - Select **"Full Dropbox"**
+   - *(This lets the app see all your folders)*
+
+   **Name your app:**
+   - Enter: `Social Media Video Automation` (or any name you like)
+   - ⚠️ **Important:** The name must be unique across ALL Dropbox apps globally
+   - If it's taken, try: `Social Media Video Auto [Your Name]`
+
+3. Check the box: **"I agree to Dropbox API Terms and Conditions"**
+
+4. Click **"Create app"**
+
+---
+
+### Step 3: Configure App Settings
+
+You'll land on your app's settings page. Let's configure it:
+
+#### A. Permissions Tab
+
+1. Click the **"Permissions"** tab
+2. Find these permissions and **check the boxes**:
+   - ✅ `files.metadata.read` - *"View information about your Dropbox files and folders"*
+   - ✅ `files.content.read` - *"View content of your Dropbox files and folders"*
+   - ✅ `files.content.write` - *"Edit content of your Dropbox files and folders"*
+
+3. Scroll to the bottom and click **"Submit"**
+
+---
+
+#### B. Settings Tab
+
+1. Go back to the **"Settings"** tab
+2. Scroll down to **"OAuth 2"** section
+3. Find **"Redirect URIs"** field
+4. Click **"Add"** button
+5. Paste this URL exactly:
+   ```
+   YOUR_N8N_PUBLIC_URL/rest/oauth2-credential/callback
+   ```
+6. Click **"Add"** button next to the text box
+7. The URL should now appear in the list below
+
+---
+
+#### C. Get Your Credentials
+
+Still on the Settings tab:
+
+1. Scroll to the top
+2. Find the **"App key"** section
+3. You'll see two important values:
+
+   ```
+   App key:     [a long string of letters and numbers]
+   App secret:  [click "Show" to reveal it]
+   ```
+
+4. **IMPORTANT:** Copy both of these and save them somewhere safe (like a password manager)
+   - You'll need them in a minute
+   - The App secret is sensitive - treat it like a password!
+
+---
+
+### Step 4: Configure Webhook
+
+This is the "doorbell" that notifies our system when you upload a video.
+
+#### Getting Your Webhook URL
+
+**Option 1: Create the webhook workflow yourself**
+
+1. Log in to your n8n instance: YOUR_N8N_PUBLIC_URL
+2. Create a new workflow
+3. Add a **Webhook** node (the only node you need for now)
+4. Click on the Webhook node to configure it
+5. Copy the **Production URL** shown in the node
+6. Your webhook URL format will be: `YOUR_N8N_PUBLIC_URL/webhook/[unique-id]`
+
+**Option 2: We'll do it together**
+
+If you prefer, skip this step and we'll create the webhook workflow together after you send me your Dropbox credentials.
+
+#### Adding Webhook to Dropbox
+
+1. Scroll down to **"Webhooks"** section in Dropbox App settings
+2. Click **"Enable webhooks"**
+3. In the **"Webhook URIs"** field, paste your webhook URL:
+   ```
+   YOUR_N8N_PUBLIC_URL/webhook/[your-unique-id]
+   ```
+   Example: `YOUR_N8N_PUBLIC_URL/webhook/254d7083-24a5-4a8b-841d-67af9c8fcd46`
+4. Click **"Add"**
+
+---
+
+### Step 5: Connect to n8n (I'll Help You With This Part)
+
+⚠️ **STOP HERE** and send me:
+- Your App key
+- Your App secret
+
+I'll configure the n8n side of things for you. This involves:
+- Adding your credentials to n8n
+- Connecting the OAuth flow
+- Testing the webhook
+
+**Why you can't do this yourself:** The n8n instance requires developer access that only I have. This will take me about 5 minutes.
+
+---
+
+### Step 6: Create Upload Folder
+
+Once I've confirmed the connection works:
+
+1. Open Dropbox (web or desktop app)
+2. Go to your main Dropbox folder
+3. Create a new folder called: **`first_upload`**
+   - Must be exactly this name (all lowercase, no spaces)
+   - This is where you'll drop videos
+
+**Folder structure:**
+```
+Dropbox/
+└── first_upload/     ← Drop videos here!
+```
+
+---
+
+### Step 7: Test the Connection
+
+Let's make sure everything works:
+
+1. Find a short test video on your computer (any video, doesn't need to be perfect)
+2. Copy it into your `/first_upload` folder
+3. Wait 5-10 seconds
+4. Check your Telegram - you should get a message!
+
+**What the test does:**
+- Dropbox detects the new file
+- Sends a webhook notification to our system
+- Our system validates the video
+- Sends you a Telegram alert
+
+**If you don't get a Telegram message:**
+- Check that the video is actually in `/first_upload`
+- Wait a full minute (sometimes Dropbox is slow)
+- Contact me if still nothing
+
+---
+
+## What You Just Set Up
+
+Let's review what's happening now:
+
+```
+You drop video in /first_upload
+  ↓
+Dropbox detects new file
+  ↓
+Dropbox sends webhook to our system
+  ↓
+System validates video specs
+  ↓
+  ├─ If valid: Creates Airtable record → Uploads to platforms
+  └─ If invalid: Sends Telegram alert → Skips this video
+```
+
+---
+
+## Token Information
+
+- **Token Type:** OAuth2 Access Token
+- **Expiration:** Approximately 7 days
+- **Renewal:** Manual - reconnect OAuth credentials in n8n
+- **Manual Action Needed:** ⚠️ Yes, every ~7 days
+
+When the token expires, you'll need to reconnect the Dropbox OAuth credentials in n8n. This takes about 2 minutes.
+
+---
+
+## Folder Organization Tips
+
+As you use the system, consider organizing your Dropbox like this:
+
+```
+Dropbox/
+├── first_upload/              ← Active: Drop new videos here
+├── archive/                   ← Optional: Move uploaded videos here
+│   ├── 2025-11/
+│   ├── 2025-12/
+│   └── ...
+└── rejected/                  ← Optional: Videos that failed validation
+```
+
+**Why organize:**
+- Keeps `/first_upload` clean
+- Easy to find old videos
+- Clear separation between processed and unprocessed
+
+**How to archive:**
+- After a video is uploaded to all platforms, move it to `/archive/2025-11/`
+- Or let the system auto-archive (we can set this up later)
+
+---
+
+## Troubleshooting
+
+### "App name already exists"
+**Solution:** Add your name or a number to make it unique. Try:
+- `Social Media Video Automation Eyal`
+- `Social Media Video Auto 2025`
+- `Video Upload Tool EyalDov`
+
+### "Webhook URI invalid"
+**Solution:** Double-check you copied the webhook URL exactly:
+```
+YOUR_N8N_PUBLIC_URL/webhook/254d7083-24a5-4a8b-841d-67af9c8fcd46
+```
+- Must include `https://`
+- No spaces
+- No typos
+
+### "Can't see Permissions tab"
+**Solution:** Make sure you created the app with "Scoped access" (not "App folder")
+
+### "Video uploaded but no Telegram message"
+**Possible causes:**
+1. Webhook not configured correctly
+2. Telegram bot not connected
+3. Dropbox taking time to sync
+
+**Steps:**
+1. Wait 1-2 minutes (Dropbox can be slow)
+2. Check the video is actually in `/first_upload` folder (not a subfolder)
+3. Contact me to check the webhook logs
+
+### "Test video rejected for wrong specs"
+**Solution:** That's actually working perfectly! The validation system detected your test video doesn't meet the specs (1080x1920, vertical). Try with a proper short-form vertical video, or just continue - the system is working correctly.
+
+---
+
+## Common Questions
+
+**Q: Can I use a different folder name?**
+A: Not recommended. The system is configured for `/first_upload`. We can change it, but let's keep it simple for now.
+
+**Q: What happens to videos after upload?**
+A: They stay in `/first_upload` until you move them. The system doesn't delete anything automatically (for safety).
+
+**Q: Can I upload multiple videos at once?**
+A: Yes! The system processes them one at a time. Remember the 6 videos/day limit (YouTube's restriction).
+
+**Q: What if I accidentally upload the wrong video?**
+A: Just delete it from the folder before it's processed. Or let it go through and delete from platforms manually.
+
+**Q: Is my data secure?**
+A: Yes! The app only has access to your Dropbox and only reads/writes files. It can't access anything else on your account.
+
+---
+
+## Next Steps
+
+✅ **Dropbox is connected!** You're ready to move on.
+
+**What's next:**
+1. Open `02_YouTube_Setup.md`
+2. We'll connect YouTube so videos can go live as Shorts
+3. Takes about 15-20 minutes
+
+---
+
+## Quick Reference
+
+**Dropbox Developer Console:** https://www.dropbox.com/developers/apps
+
+**Your App Settings:**
+- App name: [whatever you chose]
+- App key: [saved in your password manager]
+- App secret: [saved in your password manager]
+
+**Upload Folder:**
+```
+/first_upload/
+```
+
+**Webhook URL:**
+```
+need to take from n8n
+```
+
+---
+
+**Next:** Open `02_YouTube_Setup.md`
+
+---
+
+**Document Version:** 1.0
+**Created:** November 13, 2025
+**Platform:** Dropbox
+**Status:** Ready for use
