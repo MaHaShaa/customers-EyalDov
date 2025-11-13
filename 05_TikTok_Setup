@@ -1,0 +1,276 @@
+# TikTok Setup Guide
+
+**Status:** ⚠️ **Requires TikTok Developer App Creation**
+
+---
+
+## Overview
+
+TikTok requires you to create a developer app and submit it for approval before you can use their Content Posting API.
+
+---
+
+## Prerequisites
+
+Before you start, prepare:
+
+- ✅ **App logo** (1024x1024 px, JPEG/PNG, up to 5MB)
+- ✅ **Demo video** showing your automation flow (MP4/MOV, up to 50MB) - i can send you a video ive made for them! may be we'll do it after i get a permisiion :)
+- ✅ **Public documentation URLs** (Terms of Service & Privacy Policy)
+  - You can create these as simple GitHub pages
+  - Example: `https://yourusername.github.io/tiktok-app-terms/`
+
+---
+
+## Step-by-Step Setup
+
+### Step 1: Go to TikTok Developer Portal
+
+1. Open: **https://developers.tiktok.com**
+2. Sign in with your TikTok account (the one you'll post to)
+3. Click **"Manage apps"**
+4. Click **"Create an app"** or **"Connect an app"**
+
+---
+
+### Step 2: Fill in Basic Information
+
+**App icon:**
+- Upload your logo (1024x1024 px, up to 5MB, JPEG/PNG)
+
+**App name:**
+- Example: `automashaa` or `Social Media Video Automation`
+
+**Category:**
+- Select: **Education** (or relevant category)
+
+**Description:**
+- Example: *"I am a content creator building a personal automation tool to manage my own TikTok content."*
+- Keep it under 120 characters
+
+**Terms of Service URL:**
+- Your public Terms of Service page
+- Example: `https://yourusername.github.io/tiktok-app-terms/terms`
+
+**Privacy Policy URL:**
+- Your public Privacy Policy page
+- Example: `https://yourusername.github.io/tiktok-app-terms/privacy`
+
+**Platforms:**
+- Select: **Web** and **Desktop**
+
+**Web/Desktop URL:**
+- Your public website or GitHub page
+- Example: `https://yourusername.github.io/tiktok-app-terms/`
+
+---
+
+### Step 3: Configure Products and Scopes
+
+**Products to add:**
+1. **Login Kit**
+2. **Content Posting API**
+   - Enable **"Direct Post"** option
+
+**Scopes (permissions) to request:**
+- ✅ `user.info.basic` - Read user profile info
+- ✅ `video.upload` - Upload videos as drafts
+- ✅ `video.publish` - Publish videos directly
+
+---
+
+### Step 4: App Review Information
+
+**Explain how you'll use each scope:**
+
+Use this template (or similar):
+```
+How I will use each scope:
+
+1. user.info.basic - To authenticate and verify my own TikTok account
+
+2. video.upload - To upload my pre-created video content from my personal
+   library to my TikTok account
+
+3. video.publish - To publish my uploaded videos directly to my TikTok profile
+
+My Workflow:
+- I create video content and store it in my cloud storage (Dropbox)
+- My automation tool uploads these videos to my TikTok account on a scheduled basis
+- This allows me to maintain a consistent posting schedule without manual uploads
+
+I am an automation enthusiast building this tool for my personal content
+management. All videos uploaded are my own original content. This automation
+saves me time while helping me maintain consistent engagement with my audience.
+
+Expected usage: 5-10 video uploads per day to my own account only.
+```
+
+---
+
+### Step 5: Upload Demo Video
+
+**Requirements:**
+- Format: MP4 or MOV
+- Size: Up to 50MB
+- Must show: Complete end-to-end flow of your integration
+
+**What to show in the video:**
+1. Your website/GitHub page where app is hosted
+2. n8n workflow interface (can show test workflow)
+3. TikTok authentication process
+4. Video upload process (even if simulated)
+5. Video appearing on TikTok profile
+
+**Tips:**
+- Use screen recording software
+- Show the URL in browser address bar
+- Demonstrate each scope/permission you requested
+- Keep it under 2-3 minutes
+
+---
+
+### Step 6: Configure Login Kit
+
+**Redirect URI:**
+```
+YOUR_N8N_PUBLIC_URL/rest/oauth2-credential/callback
+```
+
+**Platforms:** Select **Web** and **Desktop**
+
+---
+
+### Step 7: Submit for Review
+
+1. Review all information
+2. Click **"Submit for review"**
+3. Wait for TikTok to review (5-7 business days)
+4. You'll receive an email with approval status
+
+---
+
+## After Approval
+
+Once TikTok approves your app:
+
+1. **Get your credentials:**
+   - Client Key
+   - Client Secret
+
+2. **Save them securely** in your password manager
+
+3. **We'll configure together:**
+   - Add TikTok OAuth2 credentials in n8n
+   - Test the connection
+   - Verify video upload works
+
+⚠️ **We'll do the n8n configuration together during our setup meeting.**
+
+---
+
+## TikTok Video Requirements
+
+Your videos must meet these specs:
+
+✅ **Format:** MP4
+✅ **Resolution:** 1080 x 1920 (vertical)
+✅ **Aspect Ratio:** 9:16 ONLY (TikTok is strict)
+✅ **Duration:** 3-60 seconds (recommended)
+✅ **Maximum Duration:** 10 minutes (for organic posts)
+✅ **File Size:** Under 287 MB
+✅ **Frame Rate:** 23-60 fps
+✅ **Codec:** H.264 (video), AAC (audio)
+
+Our universal video specs (1080x1920, 9:16, MP4, H.264) meet all TikTok requirements.
+
+---
+
+## Token Information
+
+TikTok tokens auto-renew.
+
+- **Token Type:** OAuth2 Access Token + Refresh Token
+- **Access Token Expiration:** 24 hours
+- **Refresh Token Expiration:** Never (as long as user doesn't revoke)
+- **Renewal:** Automatic - n8n manages it
+- **Manual Action Needed:** ❌ None!
+
+The OAuth2 system uses refresh tokens to automatically get new access tokens every 24 hours. No manual action required.
+
+---
+
+## Troubleshooting
+
+### "Application still pending after 10 days"
+**Solution:**
+- Log in to TikTok Developer Portal
+- Check app status
+- Contact developerservices@tiktok.com with your App ID
+
+### "Authorization failed"
+**Possible causes:**
+- Wrong TikTok account
+- Client credentials not configured correctly
+
+**Solution:**
+- Make sure you're logged into the correct TikTok account
+- Verify account is in good standing
+
+### "Video not appearing on profile"
+**Possible causes:**
+- TikTok still processing (can take 5-10 minutes)
+- Video flagged for review
+- Account privacy settings
+
+**Solution:**
+- Wait 10 minutes
+- Check TikTok notifications for any flags
+- Verify account is set to public
+
+---
+
+## Quick Reference
+
+**TikTok Developer Portal:** https://developers.tiktok.com
+
+**Support Email:** developerservices@tiktok.com
+
+**Required for submission:**
+- App icon (1024x1024 px)
+- Demo video (MP4/MOV, up to 50MB)
+- Terms of Service URL
+- Privacy Policy URL
+- Public website URL
+
+**OAuth Redirect URI:**
+```
+YOUR_N8N_PUBLIC_URL/rest/oauth2-credential/callback
+```
+
+**Products:**
+- Login Kit
+- Content Posting API (with Direct Post enabled)
+
+**Scopes:**
+- `user.info.basic`
+- `video.upload`
+- `video.publish`
+
+**Video Requirements:**
+- Resolution: 1080 x 1920 (vertical)
+- Aspect ratio: 9:16 ONLY
+- Duration: 3-60 seconds (10 min max)
+- Format: MP4, H.264 codec
+- File size: <287 MB (<100 MB recommended)
+
+---
+
+**Next:** Once approved, bring Client Key and Client Secret to setup meeting.
+
+---
+
+**Document Version:** 1.0
+**Created:** November 13, 2025
+**Platform:** TikTok
+**Status:** Requires app creation and approval
