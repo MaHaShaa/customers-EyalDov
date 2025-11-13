@@ -1,0 +1,422 @@
+# YouTube Setup Guide
+
+---
+
+## What You're Setting Up
+
+We're connecting your YouTube channel so the automation can upload Shorts automatically. You'll be:
+1. Creating a Google Cloud project
+2. Enabling the YouTube API
+3. Getting OAuth credentials
+4. Connecting to n8n
+
+Think of this as giving our system permission to post videos on your YouTube channel.
+
+---
+
+## Prerequisites
+
+- ✅ Google account with YouTube channel
+- ✅ Admin access to the channel
+- ✅ 20 minutes of focused time
+- ✅ Access to a computer (not phone)
+
+---
+
+## Important Upload Limits
+
+⚠️ **YouTube has strict daily quotas:**
+- **6 videos per day maximum**
+- This is **the bottleneck** for our entire system
+- Quota resets at midnight Pacific Time
+
+**What this means:**
+Your automation is configured to respect this limit. Don't try to upload more than 6 videos in a day - YouTube will reject them.
+
+---
+
+## Step-by-Step Setup
+
+### Step 1: Go to Google Cloud Console
+
+1. Open: **https://console.cloud.google.com**
+2. Sign in with your Google account (the one that owns your YouTube channel)
+3. You'll see the Google Cloud Console dashboard
+
+---
+
+### Step 2: Create a New Project
+
+1. At the top of the page, click the **project dropdown** (usually says "Select a project")
+2. Click **"NEW PROJECT"** button (top right of the popup)
+3. Fill in the form:
+
+   **Project name:**
+   ```
+   Social Media Automation
+   ```
+   *(Or any name you like)*
+
+   **Organization:** Leave as "No organization" (unless you have a Google Workspace)
+
+   **Location:** Leave as-is
+
+4. Click **"CREATE"**
+5. Wait 10-20 seconds for the project to be created
+6. Make sure your new project is selected (check the dropdown at top)
+
+---
+
+### Step 3: Enable YouTube Data API
+
+1. In the left sidebar, click **"APIs & Services"** → **"Library"**
+   - (Or use the search bar and search for "API Library")
+
+2. In the API Library search box, type: `YouTube Data API v3`
+
+3. Click on **"YouTube Data API v3"** (should be the first result)
+
+4. Click the blue **"ENABLE"** button
+
+5. Wait a few seconds - you'll be redirected to the API overview page
+
+---
+
+### Step 4: Configure OAuth Consent Screen
+
+Before creating credentials, we need to set up the consent screen (what you see when you authorize the app).
+
+1. In the left sidebar, click **"APIs & Services"** → **"OAuth consent screen"**
+
+2. Choose user type:
+   - Select **"External"** (unless you have Google Workspace, then use Internal)
+   - Click **"CREATE"**
+
+3. **App information:**
+   - **App name:** `Social Media Video Automation`
+   - **User support email:** Select your email from dropdown
+   - **App logo:** Skip (optional)
+
+4. **App domain (optional):** Skip all three fields
+
+5. **Developer contact information:**
+   - **Email addresses:** Enter your email
+
+6. Click **"SAVE AND CONTINUE"**
+
+7. **Scopes screen:**
+   - Click **"ADD OR REMOVE SCOPES"**
+   - In the filter box, search for: `youtube.upload`
+   - Check the boxes for:
+     - ✅ `.../auth/youtube` - *"Manage your YouTube account"*
+     - ✅ `.../auth/youtube.upload` - *"Manage your YouTube videos"*
+   - Click **"UPDATE"**
+   - Click **"SAVE AND CONTINUE"**
+
+8. **Test users screen:**
+   - Click **"ADD USERS"**
+   - Enter your email (the one with the YouTube channel)
+   - Click **"ADD"**
+   - Click **"SAVE AND CONTINUE"**
+
+9. **Summary screen:**
+   - Review everything
+   - Click **"BACK TO DASHBOARD"**
+
+---
+
+### Step 5: Create OAuth Credentials
+
+1. In the left sidebar, click **"APIs & Services"** → **"Credentials"**
+
+2. At the top, click **"+ CREATE CREDENTIALS"** → **"OAuth client ID"**
+
+3. **Application type:**
+   - Select **"Web application"**
+
+4. **Name:**
+   ```
+   n8n YouTube Integration
+   ```
+
+5. **Authorized redirect URIs:**
+   - Click **"+ ADD URI"**
+   - Paste this URL exactly:
+     ```
+     YOUR_N8N_PUBLIC_URL/rest/oauth2-credential/callback
+     ```
+   - Click outside the box to save
+
+6. Click **"CREATE"**
+
+7. A popup will appear with your credentials:
+   ```
+   Your Client ID:
+   [long string].apps.googleusercontent.com
+
+   Your Client Secret:
+   [shorter string]
+   ```
+
+8. **IMPORTANT:** Click the **download icon** (⬇️) to download the JSON file, OR copy both values and save them securely
+
+---
+
+### Step 6: Connect YouTube to n8n
+
+Now you'll connect YouTube to your n8n instance using the credentials you just created.
+
+1. Log in to your n8n instance: YOUR_N8N_PUBLIC_URL
+2. Go to **Settings** (gear icon in the left sidebar)
+3. Click on **Credentials**
+4. Click **"Add Credential"** button
+5. Search for and select **"YouTube OAuth2 API"**
+6. Fill in the credential form:
+   - **Name:** `YouTube - [Your Channel Name]`
+   - **Client ID:** Paste your Client ID from Step 5
+   - **Client Secret:** Paste your Client Secret from Step 5
+7. Click **"Connect my account"** button
+8. You'll see a Google sign-in popup:
+   - **Choose the Google account** that owns your YouTube channel
+   - You'll see: **"Social Media Video Automation wants to access your Google Account"**
+   - Review the permissions:
+     - View and manage your YouTube account
+     - Upload videos
+   - Click **"Continue"** or **"Allow"**
+9. You'll be redirected back to n8n
+10. Click **"Save"** to save the credential
+
+**What just happened:**
+You gave the automation permission to post videos to your YouTube channel. This permission doesn't expire and can be revoked anytime from your Google Account settings.
+
+---
+
+### Step 7: Test the Connection
+
+Once your complete workflow is set up (after all platforms are configured):
+
+1. Upload a test video to your `/first_upload` Dropbox folder
+2. The automation will process it
+3. Within 1-2 minutes, check your YouTube Studio
+4. Go to **"Content"** tab
+5. You should see your video
+
+**Video details that are auto-filled:**
+- **Title:** From filename
+- **Visibility:** Unlisted (can be changed)
+- **Category:** People & Blogs
+
+---
+
+## What You Just Set Up
+
+Here's what happens when you upload a video:
+
+```
+Video in Dropbox
+  ↓
+System validates it
+  ↓
+Downloads from Dropbox
+  ↓
+Uploads to YouTube (2-step process)
+  Step 1: Initialize upload session
+  Step 2: Upload binary data
+  ↓
+Gets video ID and URL
+  ↓
+Updates Airtable tracking
+  ↓
+Sends you confirmation (optional)
+```
+
+---
+
+## Token Information
+
+YouTube tokens never expire.
+
+- **Token Type:** OAuth2 Refresh Token
+- **Expiration:** Never (as long as you don't revoke permission)
+- **Renewal:** Automatic - n8n manages it
+- **Manual Action Needed:** ❌ None!
+
+The OAuth2 system uses "refresh tokens" that let us get new "access tokens" whenever needed. You'll never have to manually do anything.
+
+**To revoke access (if needed):**
+1. Go to: https://myaccount.google.com/permissions
+2. Find "Social Media Video Automation"
+3. Click "Remove access"
+
+---
+
+## YouTube Quota Details
+
+Understanding the limits is important for planning your uploads.
+
+### Quota Units
+
+YouTube measures API usage in "units":
+- **Daily quota:** 10,000 units
+- **Video upload:** ~1,600 units
+- **Math:** 10,000 ÷ 1,600 = 6.25 videos
+
+So you can safely upload **6 videos per day**.
+
+### Quota Reset
+
+- **When:** Midnight Pacific Time (PT)
+- **Where to check:** Google Cloud Console → APIs & Services → Dashboard
+
+### What Happens If You Hit the Limit
+
+If you try to upload a 7th video in a day:
+- YouTube API returns a quota error
+- Our system logs it to Airtable
+- You get a Telegram alert
+- The video will be retried after midnight
+
+**Best practice:** Upload 6 or fewer videos per day.
+
+---
+
+## Video Privacy Settings
+
+By default, videos are uploaded as **"Unlisted"**. Here are your options:
+
+| Setting | Who Can See It | Best For |
+|---------|----------------|----------|
+| **Private** | Only you | Testing |
+| **Unlisted** | Anyone with the link | Sharing with specific people |
+| **Public** | Everyone | Maximum reach |
+
+**To change default privacy:**
+1. Tell me your preference
+2. I'll update the workflow
+3. Or you can manually change each video in YouTube Studio
+
+---
+
+## YouTube Shorts Requirements
+
+For videos to appear in the Shorts feed, they MUST:
+
+✅ **Duration:** 60 seconds or less
+✅ **Aspect ratio:** Vertical (9:16) - 1080x1920
+✅ **Format:** MP4
+✅ **Orientation:** Portrait (vertical)
+
+If your video doesn't meet these specs, it'll still upload but won't show in Shorts - it'll be a regular video.
+
+---
+
+## Troubleshooting
+
+### "Project creation failed"
+**Solution:**
+- Make sure you're logged into the correct Google account
+- Try a different project name
+- Check if you have any billing issues (Cloud projects are free for basic API usage)
+
+### "Can't find YouTube Data API v3"
+**Solution:**
+- Use the exact search term: `YouTube Data API v3`
+- It should be the first result with a red play button icon
+
+### "OAuth consent screen shows warning"
+**Solution:** That's normal! Google shows a warning because your app isn't "verified" (which costs money and takes weeks). This is fine for personal use. Click "Advanced" → "Go to [your app] (unsafe)" to proceed.
+
+### "Video uploaded but not appearing in Shorts"
+**Possible causes:**
+1. Video is longer than 60 seconds
+2. Video is horizontal (16:9) instead of vertical (9:16)
+3. YouTube is still processing (can take 10-30 minutes)
+
+**Solution:**
+- Wait 30 minutes for YouTube processing
+- Check video specs (must be 1080x1920, <60 seconds)
+- Videos will show as regular uploads if not Shorts-compliant
+
+### "Quota exceeded error"
+**Solution:**
+- You've hit the 6 videos/day limit
+- Wait until midnight Pacific Time
+- Check quota usage: Cloud Console → APIs & Services → Dashboard
+
+### "Authorization failed"
+**Solution:**
+- Make sure you're authorizing with the correct Google account
+- Check that YouTube channel is linked to that account
+- Try revoking and re-authorizing
+
+---
+
+## Common Questions
+
+**Q: Can I change video title/description after upload?**
+A: Yes! Either manually in YouTube Studio, or I can configure the automation to use custom titles.
+
+**Q: Will this work with a brand account?**
+A: Yes, as long as you have manage permissions on the brand account.
+
+**Q: Can I upload to multiple channels?**
+A: Not simultaneously with this setup. We'd need to create separate workflows for each channel.
+
+**Q: What if I want videos to be Public immediately?**
+A: Tell me and I'll change the default privacy setting in the workflow.
+
+**Q: Does this use my personal YouTube Studio?**
+A: Yes, videos appear in your YouTube Studio like you uploaded them manually.
+
+**Q: Can I schedule uploads for specific times?**
+A: Yes! We can set up the automation to run at specific times (e.g., 9am, 3pm, 9pm).
+
+---
+
+## Next Steps
+
+✅ **YouTube is connected!** Videos will now automatically upload as Shorts.
+
+**What's next:**
+1. Open `03_Facebook_Setup.md`
+2. We'll connect Facebook (and this also sets up Instagram)
+3. This one is trickier - takes about 20-30 minutes
+
+---
+
+## Quick Reference
+
+**Google Cloud Console:** https://console.cloud.google.com
+
+**YouTube Studio:** https://studio.youtube.com
+
+**Your OAuth Credentials:**
+- Client ID: [saved in password manager]
+- Client Secret: [saved in password manager]
+
+**Redirect URI:**
+```
+YOUR_N8N_PUBLIC_URL/rest/oauth2-credential/callback
+```
+
+**Daily Limits:**
+- **Maximum:** 6 videos/day
+- **Quota:** 10,000 units
+- **Reset:** Midnight Pacific Time
+
+**Video Requirements for Shorts:**
+- Duration: ≤60 seconds
+- Resolution: 1080x1920 (vertical)
+- Aspect ratio: 9:16
+- Format: MP4
+
+---
+
+**Next:** Open `03_Facebook_Setup.md`
+
+---
+
+**Document Version:** 1.0
+**Created:** November 13, 2025
+**Platform:** YouTube
+**Status:** Ready for use
