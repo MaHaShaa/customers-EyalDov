@@ -1,0 +1,77 @@
+# Upload-Post Social Media Connection Guide
+
+## Overview
+This document explains how to connect your social media accounts to Upload-Post (https://www.upload-post.com/) for automated video posting across multiple platforms.
+
+---
+
+## Prerequisites
+
+Before you begin, ensure you have:
+- ✅ Active accounts on the social media platforms you want to connect
+- ✅ **A Facebook Business Page** (required for Facebook connections)
+- ✅ Browser access with all social media accounts logged in
+- ✅ Upload-Post account (Note: TikTok connection requires a paid subscription)
+
+---
+
+## Step-by-Step Connection Process
+
+### 1. Access Upload-Post
+- Navigate to https://www.upload-post.com/
+- Log in to your Upload-Post account
+- Go to your **User Settings** or **Connected Accounts** section
+
+### 2. Connect Each Social Media Platform
+
+You will need to approve each social media connection individually. Follow these steps for each platform:
+
+#### **YouTube**
+1. Click on the YouTube connection option
+2. You will be redirected to Google login/authorization
+3. Select the Google account associated with your YouTube channel
+4. Click **Allow** to grant Upload-Post permission to post on your behalf
+5. You will be redirected back to Upload-Post upon successful connection
+
+#### **Facebook**
+1. Click on the Facebook connection option
+2. Log in to Facebook if prompted
+3. **Important:** Select your **Facebook Business Page** (not your personal profile)
+4. Review the permissions requested
+5. Click **Confirm** or **Allow** to authorize the connection
+6. Verify that your Business Page name appears as connected
+
+#### **Instagram**
+1. Click on the Instagram connection option
+2. Log in to your Instagram account if prompted
+3. Review the permissions requested
+4. Click **Authorize** to grant access
+5. Confirm the connection was successful
+
+#### **TikTok** *(Paid Users Only)*
+1. Click on the TikTok connection option
+2. Log in to your TikTok account if prompted
+3. Review the permissions requested
+4. Click **Authorize** to grant access
+5. Confirm the connection was successful
+
+---
+
+## Verification
+
+After connecting each platform:
+1. Return to your Upload-Post dashboard
+2. Verify that all connected accounts show a **"Connected"** or **green checkmark** status
+3. Test by posting a sample video to ensure everything works correctly
+
+---
+
+## Important Notes
+
+⚠️ **Facebook Requirement:** You must have a Facebook Business Page. Personal profiles cannot be used for automated posting.
+
+⚠️ **TikTok Limitation:** TikTok connection is only available for paid Upload-Post subscribers.
+
+✅ **Tested Platforms:** YouTube, Facebook, and Instagram connections have been successfully tested and verified.
+
+---
